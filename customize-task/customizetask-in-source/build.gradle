@@ -1,0 +1,5 @@
+task hello(type: xwjie.HelloWorldTask)
+
+task hello1(type: xwjie.HelloWorldTask){
+    message ="I am a programmer"
+}

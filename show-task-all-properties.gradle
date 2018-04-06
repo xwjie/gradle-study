@@ -1,0 +1,48 @@
+task('dumpTasks') << {
+    def p = rootProject.projectDir.parentFile.path
+    def f = new File(buildDir, 'outputs/tasks.json')
+    def pw = f.newPrintWriter()
+    pw.println "{"
+    // def ts = tasks.findAll{ it.name.contains('Release') }
+    def ts = tasks.findAll()
+    def tn = ts.size()
+    ts.eachWithIndex { t, ti ->
+        pw.println "  \"${t.name}\": {"
+        def strings = [:]
+        def files = [:]
+        def atoms = [:]
+        t.properties.each { k, v ->
+            // if (k == 'path' || k == 'name' || k == 'temporaryDir') return
+            if ((v instanceof String)) {
+                strings.put(k, v)
+            } else if ((v instanceof File)) {
+                files.put(k, v)
+            } else if ((v instanceof Boolean) || (v instanceof Integer)) {
+                atoms.put(k, v)
+            }
+            else{
+              pw.println  "    \"$k\": \"$v\","
+            }
+        }
+        strings.each { k, v ->
+            pw.println  "    \"$k\": \"$v\","
+        }
+        files.each { k, File v ->
+            String s = v.path
+            if (s.startsWith(p)) {
+                s = '**' + s.substring(p.length())
+            }
+            pw.println  "    \"$k\": \"$s\","
+        }
+        def ai = 0
+        def an = atoms.size()
+        atoms.each { k, v ->
+            ai++
+            ai == an ? pw.println("    \"$k\": $v") : pw.println("    \"$k\": $v,")
+        }
+        tn == ti + 1 ? pw.println('  }') : pw.println('  },')
+    }
+    pw.println '}'
+    pw.flush()
+    pw.close()
+}

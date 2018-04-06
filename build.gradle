@@ -1,0 +1,41 @@
+// grovy 语法
+task helloworld << {
+  // name是内置的默认属性, 你也可以定义一个局部变量
+  // def name = "ddd"
+  
+  // 内置的description属性是可写的.
+  description = "this is helloworld helloworld" 
+  
+  def var1 = "xiaofengqing"
+  
+  println  " name " + name + ", hello world :" + var1;
+  println  " description: " + description
+}
+
+task hello2{
+  doFirst{
+    println "task doFirst"
+  }
+  
+  doLast{
+    println "task doLast"
+  }
+}
+
+tasks.create(name: 'hello4') << {
+   println 'hello4'
+}
+
+hello4.dependsOn helloworld
+hello4.dependsOn hello2
+
+// 将src文件夹中的所有内容拷贝到dest文件夹中
+task copy(type: Copy, group: "Custom", description: "Copies sources to the dest directory") {
+    from "src"
+    into "dest"
+}
+
+// taskA依赖于task helloworld
+task taskA(dependsOn: helloworld) {
+   //do something
+}
