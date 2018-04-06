@@ -1,3 +1,8 @@
+
+// 多个task逗号相隔
+defaultTasks 'helloworld'
+
+
 // grovy 语法
 task helloworld << {
   // name是内置的默认属性, 你也可以定义一个局部变量

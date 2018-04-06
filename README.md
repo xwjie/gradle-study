@@ -1,8 +1,11 @@
 # gradle-study
 学习gradle的demo
+参考 https://github.com/davenkin/gradle-learning.git
 
 # 前言
 Gradle本身的领域对象主要有Project和Task。Project为Task提供了执行上下文，所有的Plugin要么向Project中添加用于配置的Property，要么向Project中添加不同的Task。
+
+
 
 #配置
 ```
@@ -14,12 +17,16 @@ PATH=%PATH%;%GRADLE_HOME%\bin
 ## simple
 使用的是groovy语法
 ```
+// 多个task逗号相隔
+defaultTasks 'helloworld'
+
 // “<<”表示向helloWorld中加入执行代码
 task helloworld << {
   println "hello world"
 }
 ```
-执行命令  `gradle helloworld`
+执行命令  `gradle`  或者 增加 -q 参数 把无关输出屏蔽掉
+执行指定的task `gradle helloworld`
 
 ```
 > Task :helloworld
@@ -43,6 +50,26 @@ task helloworld << {
   println  " description: " + description
 }
 ```
+
+----
+# 包含文件
+
+包含打印所有属性的命令
+
+```
+apply from: "show-task-all-properties.gradle"
+```
+
+运行 ` gradle -b .\properties-demo.gradle dumpTasks`
+
+# 初始化
+
+
+ `gradle --init-script .\init.gradle -b .\properties-demo.gradle -q dumpTasks`
+ 
+但里面无法定义task??
+
+----
 
 # project
 
@@ -163,6 +190,34 @@ println bean.name
 ```
 
 ## 
+---
+
+# 增量式构建
+
+为了解决这样的问题，Gradle引入了增量式构建的概念。在增量式构建中，我们为每个Task定义输入（inputs）和输入（outputs），如果在执行一个Task时，如果它的输入和输出与前一次执行时没有发生变化，那么Gradle便会认为该Task是最新的（UP-TO-DATE），因此Gradle将不予执行。一个Task的inputs和outputs可以是一个或多个文件，可以是文件夹，还可以是Project的某个Property，甚至可以是某个闭包所定义的条件。
+
+见 `4-incremental-build`
+
+
+```groovy
+task combineFileContentIncremental {
+   def sources = fileTree('sourceDir')
+   def destination = file('destination.txt')
+
+   inputs.dir sources
+   outputs.file destination
+
+   doLast {
+      destination.withPrintWriter { writer ->
+         sources.each {source ->
+            writer.println source.text
+         }
+      }
+   }
+}
+```
+
+---
 
 # 任务依赖
 ## 创建的时候声明 dependsOn
